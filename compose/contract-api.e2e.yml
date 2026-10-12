@@ -1,0 +1,13 @@
+# Acréscimo ao docker-compose.yml do contract-api, usado só pelo scripts/up.sh.
+#
+# O compose do Cadastro e o do Ledger já declaram este extra_hosts; o do
+# Contrato não. No Docker Desktop (Windows e macOS) o nome
+# host.docker.internal existe de qualquer jeito, mas no Linux ele só existe
+# com esta linha. Sem ela, o Contrato não acharia o Cadastro (3001) nem o
+# Ledger (3003) publicados na máquina.
+#
+# Fica aqui, e não no repositório do Contrato, para não mudar o serviço.
+services:
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

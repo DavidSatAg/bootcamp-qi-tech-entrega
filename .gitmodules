@@ -1,0 +1,9 @@
+[submodule "party-api"]
+	path = party-api
+	url = git@github.com:ceci5/BootCamp_QiTech_Party.git
+[submodule "contract-api"]
+	path = contract-api
+	url = git@github.com:Vinicius-Maioral/BootcampQITech-APIContractor-.git
+[submodule "ledger-api"]
+	path = ledger-api
+	url = git@github.com:DavidSatAg/bootcamp-qi-tech-ledger-api.git

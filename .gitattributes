@@ -1,0 +1,3 @@
+# Os scripts rodam no bash (Linux, macOS e Git Bash no Windows):
+# com CRLF, o bash quebra na primeira linha.
+*.sh text eol=lf
