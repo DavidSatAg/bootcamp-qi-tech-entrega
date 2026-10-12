@@ -26,21 +26,27 @@ confere_docker() {
     docker compose version >/dev/null 2>&1 || erro "o plugin 'docker compose' (v2) não está instalado"
 }
 
-# Acha um Python 3.10+ e cria (uma vez) o venv .venv na raiz.
+# Acha um Python 3.11+ (a versão dos três serviços) e cria, uma vez, o venv
+# .venv na raiz. Com 3.10, testes do Ledger quebram: o datetime.fromisoformat
+# do 3.10 não lê datas terminadas em "Z".
 prepara_venv() {
     if [ -x .venv/bin/python ]; then
         PY=.venv/bin/python
     elif [ -x .venv/Scripts/python.exe ]; then
         PY=.venv/Scripts/python.exe
-    else
+    fi
+    if [ -n "${PY:-}" ] && ! "$PY" -c 'import sys; assert sys.version_info >= (3, 11)' >/dev/null 2>&1; then
+        erro "o .venv foi criado com um Python mais velho que 3.11. Apague a pasta .venv e rode de novo"
+    fi
+    if [ -z "${PY:-}" ]; then
         local base=""
-        for cand in python3 python "py -3"; do
-            if $cand -c 'import sys; assert sys.version_info >= (3, 10)' >/dev/null 2>&1; then
+        for cand in python3.11 "py -3.11" python3 python "py -3"; do
+            if $cand -c 'import sys; assert sys.version_info >= (3, 11)' >/dev/null 2>&1; then
                 base="$cand"
                 break
             fi
         done
-        [ -n "$base" ] || erro "Python 3.10 ou mais novo não encontrado (python3, python ou py -3)"
+        [ -n "$base" ] || erro "Python 3.11 ou mais novo não encontrado (python3.11, py -3.11, python3 ou python)"
         passo "criando o venv .venv com: $base"
         $base -m venv .venv
         if [ -x .venv/bin/python ]; then PY=.venv/bin/python; else PY=.venv/Scripts/python.exe; fi

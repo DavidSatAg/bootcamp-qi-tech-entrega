@@ -58,7 +58,7 @@ algo der errado.
 |---|---|---|
 | Git | qualquer recente | clonar com os submódulos |
 | Docker, com o `docker compose` v2 | Docker Desktop 4.x ou Docker Engine 24+ | subir as APIs, os bancos e os mocks |
-| Python | 3.10 ou mais novo | rodar os testes (o script cria um venv sozinho) |
+| Python | **3.11** ou mais novo (a mesma versão dos três serviços) | rodar os testes (o script cria um venv sozinho) |
 | Bash e `curl` | — | rodar os scripts |
 
 - **Windows:** rode tudo no **Git Bash**, que já vem com o Git for
@@ -218,9 +218,11 @@ e2e/test_tres_apis.py::test_fase[vida] PASSED
 e2e/test_tres_apis.py::test_fase[falhas] PASSED
 e2e/test_tres_apis.py::test_fase[extras] PASSED
 e2e/test_tres_apis.py::test_fase[pendente] PASSED
-RESUMO: 91/91 checagens passaram (run ......)
 ========== 9 passed in ...s ==========
 ```
+
+As 9 fases somam 91 checagens. Para ver cada uma (`[PASS] ...`) na tela,
+rode com `-s`: `./scripts/test-e2e.sh -s`.
 
 ### O que as fases provam
 
@@ -318,7 +320,7 @@ docker compose down -v
 
 O venv `.venv/` é criado pelo `./scripts/test-e2e.sh` ou pelo
 `./scripts/test-integration.sh`. Para criá-lo à mão, na raiz:
-`python -m venv .venv` e depois `.venv/bin/python -m pip install -r requirements-dev.txt`.
+`python3.11 -m venv .venv` (no Windows, `py -3.11 -m venv .venv`) e depois `.venv/bin/python -m pip install -r requirements-dev.txt`.
 
 A suíte do Contrato recria a API dele apontando para os mocks e, no fim,
 restaura a configuração. Por isso ela tem de rodar **sozinha**, nunca em
@@ -346,6 +348,14 @@ aparecer "Engine running".
 **`ERRO: a pasta party-api está vazia`.** O clone foi feito sem
 `--recurse-submodules`. Rode `git submodule update --init`.
 
+**Windows: `Filename too long` no clone.** O caminho da pasta passou do
+limite de 260 caracteres do Windows. Clone numa pasta de caminho curto
+(por exemplo, `C:\dev`) ou ligue os caminhos longos no Git e clone de novo:
+
+```bash
+git config --global core.longpaths true
+```
+
 **`Permission denied (publickey)` no clone.** A sua chave SSH não tem
 acesso aos repositórios. Use HTTPS (seção 1) ou peça acesso.
 
@@ -353,8 +363,11 @@ acesso aos repositórios. Use HTTPS (seção 1) ou peça acesso.
 quebra de linha do Windows. Rode `git config core.autocrlf input` e depois
 `git checkout -- scripts/`. O `.gitattributes` já evita isso num clone novo.
 
-**`ERRO: Python 3.10 ou mais novo não encontrado`.** Instale o Python
+**`ERRO: Python 3.11 ou mais novo não encontrado`.** Instale o Python 3.11
 (python.org). No Windows, marque "Add python.exe to PATH" no instalador.
+
+**`ERRO: o .venv foi criado com um Python mais velho que 3.11`.** Apague a
+pasta `.venv/` e rode o script de novo: ele recria o venv com o 3.11.
 
 **Um teste e2e falhou com `503` ou `Connection refused`.** Confira se os
 oito containers estão `healthy` (`docker ps`). Se a fase `falhas` foi
